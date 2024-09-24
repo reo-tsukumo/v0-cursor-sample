@@ -1,4 +1,4 @@
-import { SlideEditor } from '@/components/slide-editor'
+import { SlideEditor } from '@/features/slide-editor/components/SlideEditor'
 
 const SlideEditorPage = () => {
   return (
