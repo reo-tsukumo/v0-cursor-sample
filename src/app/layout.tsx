@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from './providers'
+import { Sidebar } from '@/components/layout/sidebar/Sidebar' // Sidebarコンポーネントをインポート
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,7 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex">
+            <Sidebar /> {/* Sidebarコンポーネントを追加 */}
+            <main className="flex-1">
+              {children}
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
