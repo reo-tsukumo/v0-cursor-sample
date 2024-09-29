@@ -46,8 +46,8 @@ export function UploadFileComponent() {
 
   return (
     <div className={`min-h-screen bg-white flex flex-col items-center justify-center p-4 ${inter.className}`}>
-      <h1 className="text-3xl font-bold mb-2 text-center text-gray-800 tracking-tight">AIスマートプランナー</h1>
-      <p className="text-lg text-gray-600 mb-8 text-center">PDFをアップロードして、AIがあなたの計画を最適化します。</p>
+      <h1 className="text-4xl font-bold mb-2 text-center text-gray-800 tracking-tight">AIスマートプランナー</h1>
+      <p className="text-lg text-gray-600 mb-8 text-center">オリエン資料をアップロードすると、AIが提案書の作成を支援します。</p>
       
       <div className="w-full max-w-2xl">
         <div 

@@ -1,5 +1,5 @@
-import { UploadFileComponent } from '@/components/upload-file'
-import React from 'react'
+import { UploadFileComponent } from "@/features/upload-file/components/UploadFile"
+
 
 const UploadFilePage = () => {
   return (
