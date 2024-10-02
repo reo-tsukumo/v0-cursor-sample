@@ -20,7 +20,7 @@ type GeneratedContent = {
   content: string
 }
 
-export function EnhancedChatWithVersionedContent() {
+export function Chat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [generatedContents, setGeneratedContents] = useState<GeneratedContent[]>([])

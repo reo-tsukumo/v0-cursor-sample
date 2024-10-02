@@ -1,11 +1,13 @@
-import { EnhancedChatWithVersionedContent } from '@/components/enhanced-chat-with-versioned-content'
+import { Chat } from "@/components/Chat"
+import { ChatContainer } from "@/features/chat/components/ChatContainer"
 
-const EnhancedChatPage = () => {
+
+const ChatPage = () => {
   return (
     <div>
-        <EnhancedChatWithVersionedContent />
+      <ChatContainer />
     </div>
   )
 }
 
-export default EnhancedChatPage
+export default ChatPage
