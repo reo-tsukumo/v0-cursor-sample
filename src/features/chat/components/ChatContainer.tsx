@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ChatArea } from '@/features/chat/components/ChatArea';
 import { ArtifactArea } from '@/features/chat/components/ArtifactArea';
 import { RootState } from '@/store';
-import { addMessage, addArtifact, setCurrentArtifact, removeMessagesByType } from '@/features/chat/slice';
+import { addMessage, addArtifact, setCurrentArtifact, removeMessagesByType, resetChat } from '@/features/chat/slice';
 import { setError, setExtractedText } from '@/features/upload-file/slice';
 import { Message, Artifact } from '@/features/chat/types';
 
@@ -19,6 +19,7 @@ export const ChatContainer: React.FC = () => {
   useEffect(() => {
     const fetchGeminiResponse = async () => {
       try {
+        dispatch(resetChat())
         dispatch(removeMessagesByType('loading'));
         dispatch(addMessage({ id: Date.now(), content: 'PDFを処理中...', sender: 'bot', type: 'loading' }));
 
@@ -45,6 +46,10 @@ export const ChatContainer: React.FC = () => {
           dispatch(addArtifact(newArtifact));
           // 処理完了のメッセージを追加
           dispatch(addMessage({ id: Date.now(), content: 'PDFの処理が完了しました。要約が作成されました。', sender: 'bot' }));
+        } else if (response.status === 404) {
+          // 404エラーの場合は特別な処理を行わない
+          console.log('No processing in progress');
+          dispatch(removeMessagesByType('loading'));
         } else {
           throw new Error('PDFの処理中にエラーが発生しました');
         }

@@ -27,11 +27,17 @@ const uploadFileSlice = createSlice({
       state.error = action.payload;
       state.isLoading = false;
     },
+    resetExtractedText: (state) => {
+      state.extractedText = '';
+    },
     resetUploadFile: (state) => {
-      return initialState;
+      state.uploadedFileNames = [];
+      state.extractedText = '';
+      state.isLoading = false;
+      state.error = null;
     },
   },
 });
 
-export const { setUploadedFileNames, setExtractedText, setLoading, setError, resetUploadFile } = uploadFileSlice.actions;
+export const { setUploadedFileNames, setExtractedText, setLoading, setError, resetUploadFile, resetExtractedText } = uploadFileSlice.actions;
 export default uploadFileSlice.reducer;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { loadPrompt } from '@/lib/loadPrompt';
 
 const API_KEY = process.env.GEMINI_API_KEY;
 
@@ -12,24 +13,40 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 let processingStatus: 'idle' | 'processing' | 'completed' | 'error' = 'idle';
 let extractedText = '';
 
+// プロンプトを格納する変数
+let pdfSummaryPrompt: string;
+
 export async function POST(req: NextRequest) {
-  processingStatus = 'processing';
-  
-  // 即座に202 Acceptedステータスを返す
-  const response = NextResponse.json({ message: 'Files received. Processing started.' }, { status: 202 });
-  
-  // 非同期でファイル処理を開始
-  createSummary(await req.formData());
-  
-  return response;
+  try {
+    processingStatus = 'processing';
+    extractedText = '';
+    
+    // プロンプトを非同期で読み込む
+    pdfSummaryPrompt = await loadPrompt('pdf-summary');
+    
+    const response = NextResponse.json({ message: 'Files received. Processing started.' }, { status: 202 });
+    
+    createSummary(await req.formData());
+    
+    return response;
+  } catch (error) {
+    console.error('Error in POST request:', error);
+    processingStatus = 'error';
+    return NextResponse.json({ error: 'An error occurred while processing the request' }, { status: 500 });
+  }
 }
 
 export async function GET() {
   if (processingStatus === 'processing') {
     return NextResponse.json({ message: 'Still processing' }, { status: 202 });
   } else if (processingStatus === 'completed') {
-    return NextResponse.json({ text: extractedText }, { status: 200 });
+    const result = { text: extractedText };
+    // 処理完了後、抽出されたテキストをクリア
+    extractedText = '';
+    processingStatus = 'idle';
+    return NextResponse.json(result, { status: 200 });
   } else if (processingStatus === 'error') {
+    processingStatus = 'idle';
     return NextResponse.json({ error: 'An error occurred during processing' }, { status: 500 });
   } else {
     return NextResponse.json({ message: 'No processing in progress' }, { status: 404 });
@@ -50,7 +67,7 @@ async function createSummary(formData: FormData) {
             data: Buffer.from(fileData).toString('base64')
           }
         },
-        { text: "このPDFの内容を要約してください。" }
+        { text: pdfSummaryPrompt } // 読み込んだプロンプトを使用
       ];
 
       const result = await model.generateContent(parts);
@@ -64,5 +81,8 @@ async function createSummary(formData: FormData) {
   } catch (error) {
     console.error('Error processing files:', error);
     processingStatus = 'error';
+  } finally {
+    // 処理完了後、ファイルデータをクリア
+    formData = new FormData();
   }
 }

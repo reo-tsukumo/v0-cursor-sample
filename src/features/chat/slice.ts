@@ -25,7 +25,9 @@ const chatSlice = createSlice({
       state.currentArtifactId = action.payload;
     },
     resetChat: (state) => {
-      return initialState;
+      state.messages = [];
+      state.artifacts = [];
+      state.currentArtifactId = null;
     },
   },
 });
