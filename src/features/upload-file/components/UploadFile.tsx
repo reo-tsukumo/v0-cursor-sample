@@ -1,104 +1,83 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Button } from "@/components/ui/button"
+import { useDispatch } from 'react-redux'
+import { useRouter } from 'next/navigation'
 import { Upload, Loader2 } from "lucide-react"
-import { setUploadedFileName, setExtractedText, setLoading, setError } from '../slice'
-import { RootState } from '@/store'
+import { setUploadedFileNames, setLoading, setError } from '../slice'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export function UploadFileComponent() {
   const dispatch = useDispatch()
-  const { isLoading, error, extractedText, uploadedFileName } = useSelector((state: RootState) => state.uploadFile)
+  const router = useRouter()
   const [isDragging, setIsDragging] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
-  // ドラッグオーバー時の処理
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(true)
   }
 
-  // ドラッグリーブ時の処理
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
   }
 
-  // ファイルドロップ時の処理
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
     const files = e.dataTransfer.files
     if (files.length > 0) {
-      handleFileUpload(files[0])
+      handleFileUpload(Array.from(files))
     }
   }
 
-  // ファイル選択時の処理
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
-      handleFileUpload(files[0])
+      handleFileUpload(Array.from(files))
     }
   }
 
-  // ファイルアップロード処理
-  const handleFileUpload = async (file: File) => {
-    console.log('File upload started:', file.name, 'Size:', file.size, 'Type:', file.type);
+  const handleFileUpload = async (files: File[]) => {
+    const validFiles = files.filter(file => file.type === 'application/pdf' && file.size <= MAX_FILE_SIZE)
     
-    if (file.size > MAX_FILE_SIZE) {
-      console.warn('File size exceeds limit:', file.size);
-      dispatch(setError('ファイルサイズが大きすぎます（最大10MB）'))
+    if (validFiles.length === 0) {
+      dispatch(setError('有効なPDFファイル（10MB以下）を選択してください。'))
       return
     }
-  
-    if (file.type !== 'application/pdf') {
-      console.warn('Invalid file type:', file.type);
-      dispatch(setError('PDFファイルのみアップロード可能です'))
-      return
-    }
-  
+
+    setIsUploading(true)
     dispatch(setLoading(true))
-    dispatch(setUploadedFileName(file.name))
+    dispatch(setUploadedFileNames(validFiles.map(file => file.name)))
+
+    const formData = new FormData()
+    validFiles.forEach(file => formData.append('files', file))
+
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-  
-      console.log('Sending request to /api/extract-pdf');
-      const response = await fetch('/api/extract-pdf', {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
         body: formData,
-        cache: 'no-store',
       })
-  
-      console.log('Response received:', response.status, response.statusText);
-      const contentType = response.headers.get("content-type");
-      console.log('Content-Type:', contentType);
 
-      if (contentType && contentType.indexOf("application/json") !== -1) {
+      if (response.ok) {
         const data = await response.json()
-        console.log('Response data:', data);
-        if (!response.ok) {
-          throw new Error(data.error || 'PDFの処理中にエラーが発生しました')
-        }
-        dispatch(setExtractedText(data.text))
-        console.log('テキスト抽出完了:', file.name)
+        console.log(data.message) // 'Files received. Processing started.'
+        // 処理開始の確認後、即座にチャットページに遷移
+        router.push('/chat')
       } else {
-        const text = await response.text();
-        console.error('サーバーエラー:', text);
-        throw new Error('サーバーエラーが発生しました。管理者に連絡してください。');
+        throw new Error('ファイルのアップロードに失敗しました')
       }
     } catch (error) {
-      console.error('PDFテキスト抽出エラー:', error)
-      dispatch(setError(error instanceof Error ? error.message : 'PDFテキストの抽出中にエラーが発生しました。'))
+      console.error('ファイルアップロードエラー:', error)
+      dispatch(setError('ファイルのアップロードに失敗しました。もう一度お試しください。'))
     } finally {
+      setIsUploading(false)
       dispatch(setLoading(false))
     }
   }
 
-  // ファイル選択ダイアログを開く処理
   const handleClick = () => {
     document.getElementById('file-upload')?.click();
   }
@@ -122,49 +101,25 @@ export function UploadFileComponent() {
             className="hidden"
             onChange={handleFileChange}
             accept=".pdf"
-            disabled={isLoading}
+            multiple
+            disabled={isUploading}
           />
           <div className="flex flex-col items-center">
-            {isLoading ? (
+            {isUploading ? (
               <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
             ) : (
               <Upload className="h-10 w-10 text-gray-400 mb-4" />
             )}
             <p className="text-lg font-semibold text-gray-700 text-center mb-2">
-              {isLoading ? 'アップロード中...' : 'PDFファイルをドラッグ＆ドロップ'}
+              {isUploading ? 'アップロード中...' : 'PDFファイルをドラッグ＆ドロップ'}
             </p>
-            {!isLoading && (
+            {!isUploading && (
               <p className="text-sm text-gray-500 text-center">
-                または、クリックしてファイルを選択
+                または、クリックしてファイルを選択（複数可）
               </p>
             )}
           </div>
         </div>
-        {error && (
-          <p className="text-red-500 mt-2 text-center">{error}</p>
-        )}
-        
-        {uploadedFileName && !isLoading && !error && (
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold mb-2">アップロードされたファイル: {uploadedFileName}</h2>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">抽出されたテキスト:</h3>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{extractedText}</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-8 flex flex-wrap justify-center gap-4">
-        <Button variant="outline" className="text-gray-700 hover:bg-gray-100">
-          サンプルPDFを見る
-        </Button>
-        <Button variant="outline" className="text-gray-700 hover:bg-gray-100">
-          使い方を学ぶ
-        </Button>
-        <Button variant="outline" className="text-gray-700 hover:bg-gray-100">
-          プランの例を見る
-        </Button>
       </div>
     </div>
   )
