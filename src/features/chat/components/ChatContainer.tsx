@@ -36,7 +36,15 @@ export const ChatContainer: React.FC = () => {
           const data = await response.json();
           dispatch(setExtractedText(data.text));
           dispatch(removeMessagesByType('loading'));
-          dispatch(addMessage({ id: Date.now(), content: data.text, sender: 'bot' }));
+          // アーティファクトとして追加
+          const newArtifact: Artifact = {
+            id: Date.now(),
+            title: 'PDF要約',
+            content: data.text
+          };
+          dispatch(addArtifact(newArtifact));
+          // 処理完了のメッセージを追加
+          dispatch(addMessage({ id: Date.now(), content: 'PDFの処理が完了しました。要約が作成されました。', sender: 'bot' }));
         } else {
           throw new Error('PDFの処理中にエラーが発生しました');
         }
