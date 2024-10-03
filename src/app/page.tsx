@@ -1,9 +1,5 @@
-import React from 'react'
+import { redirect } from 'next/navigation'
 
-const MainPage = () => {
-  return (
-    <div>This App is made by v0 and Cursor</div>
-  )
+export default function MainPage() {
+  redirect('/upload-file')
 }
-
-export default MainPage
