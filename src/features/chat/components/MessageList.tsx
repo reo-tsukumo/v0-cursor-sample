@@ -4,8 +4,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 
-
-// メッセージリストを表示するコンポーネント
 interface MessageListProps {
   messages: Message[];
 }

@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UploadFileState } from './types';
 
 const initialState: UploadFileState = {
-  uploadedFileNames: [], // 変更: 初期値を空配列に
+  uploadedFileNames: [],
   extractedText: '',
   isLoading: false,
   error: null,
@@ -12,7 +12,7 @@ const uploadFileSlice = createSlice({
   name: 'uploadFile',
   initialState,
   reducers: {
-    setUploadedFileNames: (state, action: PayloadAction<string[]>) => { // 変更: 複数のファイル名を設定するアクションに
+    setUploadedFileNames: (state, action: PayloadAction<string[]>) => {
       state.uploadedFileNames = action.payload;
     },
     setExtractedText: (state, action: PayloadAction<string>) => {
@@ -27,8 +27,11 @@ const uploadFileSlice = createSlice({
       state.error = action.payload;
       state.isLoading = false;
     },
+    resetUploadFile: (state) => {
+      return initialState;
+    },
   },
 });
 
-export const { setUploadedFileNames, setExtractedText, setLoading, setError } = uploadFileSlice.actions;
+export const { setUploadedFileNames, setExtractedText, setLoading, setError, resetUploadFile } = uploadFileSlice.actions;
 export default uploadFileSlice.reducer;

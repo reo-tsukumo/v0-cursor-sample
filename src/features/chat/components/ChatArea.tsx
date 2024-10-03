@@ -3,7 +3,6 @@ import { MessageList } from '@/features/chat/components/MessageList';
 import { MessageInput } from '@/features/chat/components/MessageInput';
 import { Message } from '@/features/chat/types';
 
-// チャットエリアを表示するコンポーネント
 interface ChatAreaProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
