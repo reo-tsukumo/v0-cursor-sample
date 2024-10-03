@@ -86,8 +86,8 @@ export const ChatContainer: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: content,
-          context: '私はエンジニアです。Metaで働いています。',
-          task: 'summary',
+          context: 'AIの歴史を教えて',
+          task: 'chat',
           user: 'default_user'
         }),
       });

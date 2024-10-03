@@ -3,33 +3,18 @@ import { Artifact } from '../types';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CopyIcon, DownloadIcon } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
-// 選択されたアーティファクトを表示するコンポーネント
 interface ArtifactViewerProps {
   artifact: Artifact;
 }
 
 export const ArtifactViewer: React.FC<ArtifactViewerProps> = ({ artifact }) => {
   return (
-    <div className="flex-grow flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h1 className="text-xl font-semibold">{artifact.title}</h1>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon">
-            <CopyIcon className="h-4 w-4" />
-            <span className="sr-only">Copy content</span>
-          </Button>
-          <Button variant="outline" size="icon">
-            <DownloadIcon className="h-4 w-4" />
-            <span className="sr-only">Download content</span>
-          </Button>
-        </div>
+    <ScrollArea className="flex-grow px-4 py-4">
+      <div className="markdown-content prose dark:prose-invert max-w-none">
+        <ReactMarkdown>{artifact.content}</ReactMarkdown>
       </div>
-      <ScrollArea className="flex-grow p-4">
-        <div className="prose max-w-none">
-         <p>{artifact.content}</p>
-        </div>
-      </ScrollArea>
-    </div>
+    </ScrollArea>
   );
 };
