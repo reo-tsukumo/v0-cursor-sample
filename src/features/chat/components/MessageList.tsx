@@ -3,6 +3,7 @@ import { Message } from '../types';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button"; // 追加
 
 interface MessageListProps {
   messages: Message[];

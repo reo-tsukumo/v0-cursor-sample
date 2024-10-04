@@ -108,6 +108,40 @@ export const ChatContainer: React.FC = () => {
     }
   };
 
+  const handleSpecialAction = async (action: 'summarize' | 'paginate') => {
+    const message = action === 'summarize' ? '要約して' : 'ページネーションを作成して';
+    const userMessage: Message = { id: Date.now(), content: message, sender: 'user' };
+    dispatch(addMessage(userMessage));
+
+    try {
+      const response = await fetch('/api/dify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: message,
+          context: 'AIの歴史を教えて',
+          task: 'chat',
+          user: 'default_user'
+        }),
+      });
+      const data = await response.json();
+
+      const llmMessage: Message = { id: Date.now() + 1, content: data.llmMessage, sender: 'bot' };
+      dispatch(addMessage(llmMessage));
+
+      if (data.artifact) {
+        const newArtifact: Artifact = { id: Date.now() + 2, ...data.artifact };
+        dispatch(addArtifact(newArtifact));
+        dispatch(setCurrentArtifact(newArtifact.id));
+      }
+
+      setConversationId(data.conversationId);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      dispatch(setError('メッセージの送信中にエラーが発生しました。'));
+    }
+  };
+
   return (
     <div className="flex h-screen">
       <ChatArea messages={messages} onSendMessage={handleSendMessage} />
@@ -116,6 +150,8 @@ export const ChatContainer: React.FC = () => {
           artifacts={artifacts}
           currentArtifactId={currentArtifactId}
           onSelectArtifact={(id) => dispatch(setCurrentArtifact(id))}
+          onSummarize={() => handleSpecialAction('summarize')}
+          onPaginate={() => handleSpecialAction('paginate')}
         />
       )}
     </div>

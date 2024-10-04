@@ -56,7 +56,7 @@ export async function GET() {
 async function createSummary(formData: FormData) {
   try {
     const files = formData.getAll('files') as File[];
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     for (const file of files) {
       const fileData = await file.arrayBuffer();
@@ -74,7 +74,7 @@ async function createSummary(formData: FormData) {
       const response = await result.response;
       const summary = response.text();
 
-      extractedText += `${file.name} の要約:\n${summary}\n\n`;
+      extractedText += `${summary}`;
     }
 
     processingStatus = 'completed';
