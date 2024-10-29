@@ -4,7 +4,7 @@ import { PlusIcon, HistoryIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDispatch } from 'react-redux'
 import { resetChat } from '@/features/chat/slice'
-import { resetExtractedText, resetUploadFile } from '@/features/upload-file/slice'
+import { resetExtractedDocuments, resetUploadFile } from '@/features/upload-file/slice'
 import { useRouter } from 'next/navigation'
 
 export function Sidebar() {
@@ -14,7 +14,7 @@ export function Sidebar() {
   const handleNewChat = () => {
     dispatch(resetChat())
     dispatch(resetUploadFile())
-    dispatch(resetExtractedText())
+    dispatch(resetExtractedDocuments())
     router.push('/upload-file')
   }
 

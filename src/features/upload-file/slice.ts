@@ -3,7 +3,8 @@ import { UploadFileState } from './types';
 
 const initialState: UploadFileState = {
   uploadedFileNames: [],
-  extractedText: '',
+  uploadedFileIds: [],
+  extractedDocuments: '',
   isLoading: false,
   error: null,
 };
@@ -15,8 +16,11 @@ const uploadFileSlice = createSlice({
     setUploadedFileNames: (state, action: PayloadAction<string[]>) => {
       state.uploadedFileNames = action.payload;
     },
-    setExtractedText: (state, action: PayloadAction<string>) => {
-      state.extractedText = action.payload;
+    setUploadedFileIds: (state, action: PayloadAction<string[]>) => {
+      state.uploadedFileIds = action.payload;
+    },
+    setExtractedDocuments: (state, action: PayloadAction<string>) => {
+      state.extractedDocuments = action.payload;
       state.isLoading = false;
       state.error = null;
     },
@@ -27,17 +31,18 @@ const uploadFileSlice = createSlice({
       state.error = action.payload;
       state.isLoading = false;
     },
-    resetExtractedText: (state) => {
-      state.extractedText = '';
+    resetExtractedDocuments: (state) => {
+      state.extractedDocuments = '';
     },
     resetUploadFile: (state) => {
       state.uploadedFileNames = [];
-      state.extractedText = '';
+      state.uploadedFileIds = [];
+      state.extractedDocuments = '';
       state.isLoading = false;
       state.error = null;
     },
   },
 });
 
-export const { setUploadedFileNames, setExtractedText, setLoading, setError, resetUploadFile, resetExtractedText } = uploadFileSlice.actions;
+export const { setUploadedFileNames, setUploadedFileIds, setExtractedDocuments, setLoading, setError, resetUploadFile, resetExtractedDocuments } = uploadFileSlice.actions;
 export default uploadFileSlice.reducer;

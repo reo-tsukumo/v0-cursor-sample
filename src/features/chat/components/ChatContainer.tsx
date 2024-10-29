@@ -6,7 +6,7 @@ import { ChatArea } from '@/features/chat/components/ChatArea';
 import { ArtifactArea } from '@/features/chat/components/ArtifactArea';
 import { RootState } from '@/store';
 import { addMessage, addArtifact, setCurrentArtifact, removeMessagesByType, resetChat } from '@/features/chat/slice';
-import { setError, setExtractedText } from '@/features/upload-file/slice';
+import { setError, setExtractedDocuments } from '@/features/upload-file/slice';
 import { Message, Artifact } from '@/features/chat/types';
 
 export const ChatContainer: React.FC = () => {
@@ -35,7 +35,7 @@ export const ChatContainer: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          dispatch(setExtractedText(data.text));
+          dispatch(setExtractedDocuments(data.text));
           dispatch(removeMessagesByType('loading'));
           // アーティファクトとして追加
           const newArtifact: Artifact = {
